@@ -1,0 +1,96 @@
+{
+  "app": {
+    "name": "ChatAI",
+    "welcome": "Select or create a conversation to start chatting",
+    "newChat": "New Chat",
+    "startChat": "Start a new conversation",
+    "hint": "Enter to send · Shift+Enter to break"
+  },
+  "sidebar": {
+    "search": "Search conversations...",
+    "conversations": "Conversations",
+    "noConversations": "No conversations yet, click the button above to start",
+    "importFile": "Import File",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar"
+  },
+  "chat": {
+    "inputPlaceholder": "Type a message...",
+    "send": "Send",
+    "thinking": "AI thinking...",
+    "replying": "Replying...",
+    "rename": "Rename",
+    "delete": "Delete",
+    "renamePrompt": "Rename conversation",
+    "copy": "Copy",
+    "copied": "Copied",
+    "modelSelector": "Select Model",
+    "manageModels": "Manage Models..."
+  },
+  "settings": {
+    "title": "Settings",
+    "models": "Models",
+    "characters": "Characters",
+    "knowledge": "Knowledge",
+    "modelConfig": "Model Configuration",
+    "addModel": "+ Add",
+    "add": "Add",
+    "save": "Save",
+    "cancel": "Cancel",
+    "provider": "Provider",
+    "apiKey": "API Key",
+    "apiUrl": "API URL",
+    "modelName": "Model Name",
+    "testConnection": "Test Connection",
+    "fetchModels": "Fetch Models",
+    "inUse": "Active",
+    "noModels": "No models configured, add one to get started",
+    "connectSuccess": "Connected successfully!",
+    "connectFail": "Connection failed, please check configuration",
+    "configureModel": "⚙️ Settings"
+  },
+  "character": {
+    "create": "Create",
+    "createPrompt": "Create Character",
+    "name": "Character Name",
+    "description": "Brief description of this character",
+    "systemPrompt": "System Prompt",
+    "noCharacters": "No custom characters"
+  },
+  "knowledge": {
+    "title": "Knowledge Base",
+    "upload": "+ Upload File",
+    "description": "Upload files to let AI answer based on your documents. Supports PDF, Word, TXT, Markdown, code files, etc.",
+    "noFiles": "No knowledge base files",
+    "chunks": "chunks",
+    "indexFailed": "Indexing failed",
+    "indexing": "Indexing...",
+    "parsing": "Parsing...",
+    "knowledgeOn": "KB On",
+    "knowledgeOff": "KB Off",
+    "knowledgeOnHint": "Answer based on knowledge base (enabled)",
+    "knowledgeOffHint": "Answer based on knowledge base (disabled)"
+  },
+  "theme": {
+    "light": "Switch to light mode",
+    "dark": "Switch to dark mode"
+  },
+  "export": {
+    "title": "Export Conversation",
+    "markdown": "Export Markdown",
+    "json": "Export JSON",
+    "success": "Export successful",
+    "fail": "Export failed"
+  },
+  "shortcuts": {
+    "newChat": "Ctrl+N New Chat",
+    "toggleSidebar": "Ctrl+B Sidebar",
+    "toggleTheme": "Ctrl+Shift+T Theme",
+    "sendMessage": "Enter Send"
+  },
+  "error": {
+    "requestFailed": "Error: Request failed, please check API Key and network connection.",
+    "generic": "Error: Request failed",
+    "noModel": "Please configure a model in Settings first"
+  }
+}

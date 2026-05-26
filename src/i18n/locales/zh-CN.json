@@ -1,0 +1,96 @@
+{
+  "app": {
+    "name": "ChatAI",
+    "welcome": "选择或创建一个对话开始聊天",
+    "newChat": "新对话",
+    "startChat": "开始新对话",
+    "hint": "Enter 发送 · Shift+Enter 换行"
+  },
+  "sidebar": {
+    "search": "搜索对话...",
+    "conversations": "对话列表",
+    "noConversations": "还没有对话，点击上方按钮开始",
+    "importFile": "导入文件",
+    "collapse": "收起侧边栏",
+    "expand": "展开侧边栏"
+  },
+  "chat": {
+    "inputPlaceholder": "输入消息...",
+    "send": "发送",
+    "thinking": "AI思考中...",
+    "replying": "回复中...",
+    "rename": "重命名",
+    "delete": "删除",
+    "renamePrompt": "重命名对话",
+    "copy": "复制",
+    "copied": "已复制",
+    "modelSelector": "选择模型",
+    "manageModels": "管理模型..."
+  },
+  "settings": {
+    "title": "设置",
+    "models": "模型",
+    "characters": "AI 角色",
+    "knowledge": "知识库",
+    "modelConfig": "模型配置",
+    "addModel": "+ 添加",
+    "add": "添加",
+    "save": "保存",
+    "cancel": "取消",
+    "provider": "服务商",
+    "apiKey": "API Key",
+    "apiUrl": "API 地址",
+    "modelName": "模型名称",
+    "testConnection": "测试连接",
+    "fetchModels": "获取模型列表",
+    "inUse": "使用中",
+    "noModels": "暂无模型配置，添加一个开始使用",
+    "connectSuccess": "连接成功！",
+    "connectFail": "连接失败，请检查配置",
+    "configureModel": "⚙️ 配置模型"
+  },
+  "character": {
+    "create": "创建",
+    "createPrompt": "创建角色",
+    "name": "角色名称",
+    "description": "一句话描述这个角色的用途",
+    "systemPrompt": "系统提示词（System Prompt）",
+    "noCharacters": "暂无自定义角色"
+  },
+  "knowledge": {
+    "title": "知识库",
+    "upload": "+ 上传文件",
+    "description": "上传文件后，AI 将基于你的文件内容回答问题。支持 PDF、Word、TXT、Markdown、代码文件等。",
+    "noFiles": "暂无知识库文件",
+    "chunks": "个文本块",
+    "indexFailed": "索引失败",
+    "indexing": "索引中...",
+    "parsing": "正在解析...",
+    "knowledgeOn": "知识库开",
+    "knowledgeOff": "知识库关",
+    "knowledgeOnHint": "基于知识库回答（已开启）",
+    "knowledgeOffHint": "基于知识库回答（已关闭）"
+  },
+  "theme": {
+    "light": "切换到浅色模式",
+    "dark": "切换到深色模式"
+  },
+  "export": {
+    "title": "导出对话",
+    "markdown": "导出 Markdown",
+    "json": "导出 JSON",
+    "success": "导出成功",
+    "fail": "导出失败"
+  },
+  "shortcuts": {
+    "newChat": "Ctrl+N 新对话",
+    "toggleSidebar": "Ctrl+B 侧边栏",
+    "toggleTheme": "Ctrl+Shift+T 主题",
+    "sendMessage": "Enter 发送"
+  },
+  "error": {
+    "requestFailed": "错误：请求失败，请检查 API Key 和网络连接。",
+    "generic": "错误：请求失败",
+    "noModel": "请先在设置中配置一个模型"
+  }
+}

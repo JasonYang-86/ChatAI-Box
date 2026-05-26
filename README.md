@@ -4,6 +4,18 @@
 
 > 🚀 本项目由 [TRAE](https://trae.ai) AI 编程助手全程开发
 
+## 📥 下载安装
+
+**Windows 用户可直接下载免安装版：**
+
+👉 **[下载 ChatAI-Windows.zip](https://github.com/JasonYang-86/ChatAI-Box/releases/latest)**
+
+1. 下载 `ChatAI-Windows.zip`
+2. 解压到任意目录
+3. 双击 `win-unpacked/ChatAI.exe` 即可运行
+
+首次使用需在设置中配置 API Key（支持 OpenAI / DeepSeek / 通义千问等），或在本地安装 [Ollama](https://ollama.com) 后添加本地模型（免费离线）。
+
 ## 特性
 
 - 🌐 **7 大模型提供商** — OpenAI / Anthropic Claude / DeepSeek / 通义千问 / Moonshot (Kimi) / Ollama 本地模型 / OpenAI 兼容接口

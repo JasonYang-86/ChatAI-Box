@@ -2,6 +2,8 @@
 
 一个极简风格的桌面 AI 聊天软件，支持国内外主流大模型自由切换，数据完全本地存储，具备本地知识库（RAG）能力。
 
+> 🚀 本项目由 [TRAE](https://trae.ai) AI 编程助手全程开发
+
 ## 特性
 
 - 🌐 **7 大模型提供商** — OpenAI / Anthropic Claude / DeepSeek / 通义千问 / Moonshot (Kimi) / Ollama 本地模型 / OpenAI 兼容接口

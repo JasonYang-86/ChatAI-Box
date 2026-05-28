@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useKnowledgeStore } from '@/stores/knowledgeStore';
 
 interface ChatInputProps {
@@ -10,6 +11,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   const [input, setInput] = useState('');
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const { knowledgeEnabled, setKnowledgeEnabled, files } = useKnowledgeStore();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (textareaRef.current) {
@@ -39,16 +41,17 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
   return (
     <div className="border-t border-border bg-bg-primary px-4 py-3">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-end gap-2 bg-bg-secondary rounded-2xl px-4 py-2 border border-border focus-within:border-accent transition-colors">
+        <div className="flex items-end gap-2 bg-bg-secondary rounded-2xl px-4 py-2 border border-border focus-within:border-accent transition-all duration-200 focus-within:shadow-sm">
           <textarea
             ref={textareaRef}
             className="flex-1 resize-none bg-transparent text-text-primary text-[15px] leading-relaxed outline-none placeholder:text-text-secondary py-1.5 max-h-[200px]"
-            placeholder="输入消息..."
+            placeholder={t('chat.inputPlaceholder')}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             rows={1}
             disabled={disabled}
+            aria-label={t('chat.inputPlaceholder')}
           />
           <button
             className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-150 ${
@@ -58,6 +61,7 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
             }`}
             onClick={handleSend}
             disabled={!input.trim() || disabled}
+            aria-label={t('chat.send')}
           >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
@@ -69,19 +73,21 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
             {hasKnowledgeFiles && (
               <button
                 onClick={() => setKnowledgeEnabled(!knowledgeEnabled)}
-                className={`text-xs px-2 py-0.5 rounded-md transition-colors ${
+                className={`text-xs px-2 py-0.5 rounded-md transition-all duration-200 ${
                   knowledgeEnabled
                     ? 'bg-accent/10 text-accent border border-accent/30'
-                    : 'bg-bg-tertiary text-text-secondary border border-border'
+                    : 'bg-bg-tertiary text-text-secondary border border-border hover:border-text-secondary'
                 }`}
-                title={knowledgeEnabled ? '基于知识库回答（已开启）' : '基于知识库回答（已关闭）'}
+                title={knowledgeEnabled ? t('knowledge.knowledgeOnHint') : t('knowledge.knowledgeOffHint')}
+                aria-label={knowledgeEnabled ? t('knowledge.knowledgeOff') : t('knowledge.knowledgeOn')}
               >
-                📚 {knowledgeEnabled ? '知识库开' : '知识库关'}
+                <span className="mr-1">📚</span>
+                {knowledgeEnabled ? t('knowledge.knowledgeOn') : t('knowledge.knowledgeOff')}
               </button>
             )}
           </div>
-          <p className="text-text-secondary text-[11px] opacity-60">
-            Enter 发送 · Shift+Enter 换行
+          <p className="text-text-secondary text-[11px] opacity-50 select-none">
+            {t('app.hint')}
           </p>
         </div>
       </div>

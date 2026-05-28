@@ -17,7 +17,7 @@
   "chat": {
     "inputPlaceholder": "输入消息...",
     "send": "发送",
-    "thinking": "AI思考中...",
+    "thinking": "AI 思考中...",
     "replying": "回复中...",
     "rename": "重命名",
     "delete": "删除",
@@ -47,7 +47,7 @@
     "noModels": "暂无模型配置，添加一个开始使用",
     "connectSuccess": "连接成功！",
     "connectFail": "连接失败，请检查配置",
-    "configureModel": "⚙️ 配置模型"
+    "configureModel": "配置模型"
   },
   "character": {
     "create": "创建",
@@ -87,6 +87,19 @@
     "toggleSidebar": "Ctrl+B 侧边栏",
     "toggleTheme": "Ctrl+Shift+T 主题",
     "sendMessage": "Enter 发送"
+  },
+  "confirm": {
+    "deleteConversation": "确认删除该对话？",
+    "deleteConversationDesc": "此操作不可撤销。",
+    "confirm": "确认",
+    "cancel": "取消",
+    "deleteModel": "确认删除该模型配置？",
+    "deleteFile": "确认从知识库中移除该文件？"
+  },
+  "model": {
+    "noModel": "没有配置模型",
+    "configureHint": "前往设置添加 AI 模型开始使用",
+    "goSettings": "前往设置"
   },
   "error": {
     "requestFailed": "错误：请求失败，请检查 API Key 和网络连接。",

@@ -11,6 +11,14 @@
   --user-bubble: #007AFF;
   --ai-bubble: #F0F0F0;
   --border: #E5E5EA;
+  --code-bg: #F5F5F7;
+  --code-text: #1D1D1F;
+  --code-block-bg: #1e1e2e;
+  --code-block-text: #cdd6f4;
+  --code-lang-color: #6c7086;
+  --code-copy-bg: #313244;
+  --code-copy-hover: #45475a;
+  --shadow-color: rgba(0, 0, 0, 0.06);
 }
 
 .dark {
@@ -22,12 +30,24 @@
   --user-bubble: #0A84FF;
   --ai-bubble: #2C2C2E;
   --border: #38383A;
+  --code-bg: #2C2C2E;
+  --code-text: #cdd6f4;
+  --code-block-bg: #11111b;
+  --code-block-text: #cdd6f4;
+  --code-lang-color: #585b70;
+  --code-copy-bg: #1e1e2e;
+  --code-copy-hover: #313244;
+  --shadow-color: rgba(0, 0, 0, 0.3);
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+html {
+  transition: color-scheme 0.3s ease;
 }
 
 html, body, #root {
@@ -41,6 +61,9 @@ body {
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 ::-webkit-scrollbar {
@@ -60,24 +83,30 @@ body {
   background-color: var(--text-secondary);
 }
 
+:focus-visible {
+  outline: 2px solid var(--user-bubble);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 @layer components {
   .sidebar-item {
     @apply flex items-center gap-2.5 px-3 py-2 mx-2 rounded-lg cursor-pointer text-text-secondary
-      hover:bg-bg-tertiary hover:text-text-primary transition-colors duration-150 text-sm;
+      hover:bg-bg-tertiary hover:text-text-primary transition-colors duration-200 text-sm;
   }
 
   .sidebar-item.active {
-    @apply bg-bg-tertiary text-text-primary;
+    @apply bg-bg-tertiary text-text-primary font-medium;
   }
 
   .btn {
     @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2 text-sm font-medium
-      transition-all duration-150 hover:scale-[1.02] active:scale-[0.98]
+      transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]
       disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100;
   }
 
   .btn-primary {
-    @apply btn bg-accent text-white hover:bg-accent-hover;
+    @apply btn bg-accent text-white hover:bg-accent-hover shadow-sm;
   }
 
   .btn-secondary {
@@ -113,7 +142,10 @@ body {
   .markdown-content em { @apply italic; }
 
   .markdown-content pre {
-    @apply relative bg-[#1e1e2e] text-[#cdd6f4] rounded-xl my-3 overflow-x-auto;
+    @apply relative rounded-xl my-3 overflow-x-auto;
+    background-color: var(--code-block-bg);
+    color: var(--code-block-text);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   .markdown-content pre > code {
@@ -121,7 +153,10 @@ body {
   }
 
   .markdown-content :not(pre) > code {
-    @apply bg-bg-tertiary text-accent px-1.5 py-0.5 rounded-md text-sm font-mono;
+    background-color: var(--code-bg);
+    color: var(--user-bubble);
+    @apply px-1.5 py-0.5 rounded-md text-sm font-mono;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
   .code-block-wrapper {
@@ -133,8 +168,9 @@ body {
     top: 0.5rem;
     right: 3rem;
     font-size: 0.75rem;
-    color: #6c7086;
+    color: var(--code-lang-color);
     font-family: 'JetBrains Mono', 'Cascadia Code', monospace;
+    transition: color 0.3s ease;
   }
 
   .code-block-wrapper .copy-button {
@@ -144,10 +180,10 @@ body {
     padding: 0.25rem 0.5rem;
     font-size: 0.75rem;
     border-radius: 0.375rem;
-    background: #313244;
-    color: #cdd6f4;
+    background: var(--code-copy-bg);
+    color: var(--code-block-text);
     opacity: 0;
-    transition: opacity 150ms;
+    transition: opacity 150ms, background-color 0.3s ease;
     border: none;
     cursor: pointer;
   }
@@ -157,6 +193,42 @@ body {
   }
 
   .copy-button:hover {
-    background: #45475a;
+    background: var(--code-copy-hover);
+  }
+
+  @keyframes dot-bounce {
+    0%, 60%, 100% { transform: translateY(0); opacity: 0.6; }
+    30% { transform: translateY(-4px); opacity: 1; }
+  }
+
+  .animate-dot-bounce {
+    animation: dot-bounce 1.4s infinite ease-in-out;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  @keyframes slide-in-right {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.3s ease-out;
+  }
+
+  @keyframes slide-out-right {
+    from { transform: translateX(0); opacity: 1; }
+    to { transform: translateX(100%); opacity: 0; }
+  }
+
+  .animate-slide-out-right {
+    animation: slide-out-right 0.25s ease-in;
   }
 }

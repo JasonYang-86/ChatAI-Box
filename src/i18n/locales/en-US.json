@@ -30,8 +30,8 @@
   "settings": {
     "title": "Settings",
     "models": "Models",
-    "characters": "Characters",
-    "knowledge": "Knowledge",
+    "characters": "AI Characters",
+    "knowledge": "Knowledge Base",
     "modelConfig": "Model Configuration",
     "addModel": "+ Add",
     "add": "Add",
@@ -44,10 +44,10 @@
     "testConnection": "Test Connection",
     "fetchModels": "Fetch Models",
     "inUse": "Active",
-    "noModels": "No models configured, add one to get started",
+    "noModels": "No models configured yet. Add one to get started.",
     "connectSuccess": "Connected successfully!",
-    "connectFail": "Connection failed, please check configuration",
-    "configureModel": "⚙️ Settings"
+    "connectFail": "Connection failed. Please check your configuration.",
+    "configureModel": "Configure Models"
   },
   "character": {
     "create": "Create",
@@ -55,13 +55,13 @@
     "name": "Character Name",
     "description": "Brief description of this character",
     "systemPrompt": "System Prompt",
-    "noCharacters": "No custom characters"
+    "noCharacters": "No custom characters yet"
   },
   "knowledge": {
     "title": "Knowledge Base",
     "upload": "+ Upload File",
     "description": "Upload files to let AI answer based on your documents. Supports PDF, Word, TXT, Markdown, code files, etc.",
-    "noFiles": "No knowledge base files",
+    "noFiles": "No files in knowledge base",
     "chunks": "chunks",
     "indexFailed": "Indexing failed",
     "indexing": "Indexing...",
@@ -77,9 +77,9 @@
   },
   "export": {
     "title": "Export Conversation",
-    "markdown": "Export Markdown",
-    "json": "Export JSON",
-    "success": "Export successful",
+    "markdown": "Export as Markdown",
+    "json": "Export as JSON",
+    "success": "Exported successfully",
     "fail": "Export failed"
   },
   "shortcuts": {
@@ -87,6 +87,19 @@
     "toggleSidebar": "Ctrl+B Sidebar",
     "toggleTheme": "Ctrl+Shift+T Theme",
     "sendMessage": "Enter Send"
+  },
+  "confirm": {
+    "deleteConversation": "Delete this conversation?",
+    "deleteConversationDesc": "This action cannot be undone.",
+    "confirm": "Confirm",
+    "cancel": "Cancel",
+    "deleteModel": "Delete this model configuration?",
+    "deleteFile": "Remove this file from knowledge base?"
+  },
+  "model": {
+    "noModel": "No model configured",
+    "configureHint": "Go to Settings to add an AI model to get started",
+    "goSettings": "Go To Settings"
   },
   "error": {
     "requestFailed": "Error: Request failed, please check API Key and network connection.",

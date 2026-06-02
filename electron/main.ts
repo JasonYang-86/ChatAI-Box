@@ -18,6 +18,7 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     title: 'ChatAI',
+    icon: path.join(__dirname, '../resources/icons/icon.ico'),
     backgroundColor: '#FFFFFF',
     show: false,
     webPreferences: {

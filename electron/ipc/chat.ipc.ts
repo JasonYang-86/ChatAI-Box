@@ -6,6 +6,105 @@ import {
   getAllProviders,
 } from '../services/model-adapter';
 import { mcpManager } from '../services/mcp/mcp-manager';
+import * as fsOps from '../services/file-system';
+
+const FILE_SYSTEM_TOOLS = [
+  {
+    type: 'function' as const,
+    function: {
+      name: 'fs_list_directory',
+      description: '列出指定目录下的所有文件和文件夹。参数 path 是相对于工作目录的路径，留空表示根目录。',
+      parameters: {
+        type: 'object' as const,
+        properties: { path: { type: 'string', description: '目录路径，相对于工作目录' } },
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'fs_read_file',
+      description: '读取指定文件的内容。参数 path 是相对于工作目录的文件路径。',
+      parameters: {
+        type: 'object' as const,
+        properties: { path: { type: 'string', description: '文件路径，相对于工作目录' } },
+        required: ['path'],
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'fs_write_file',
+      description: '将内容写入指定文件，如果文件不存在则创建。参数 path 是文件路径，content 是写入的内容。',
+      parameters: {
+        type: 'object' as const,
+        properties: {
+          path: { type: 'string', description: '文件路径，相对于工作目录' },
+          content: { type: 'string', description: '要写入的完整内容' },
+        },
+        required: ['path', 'content'],
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'fs_create_directory',
+      description: '创建一个新文件夹。参数 path 是相对于工作目录的文件夹路径。',
+      parameters: {
+        type: 'object' as const,
+        properties: { path: { type: 'string', description: '文件夹路径' } },
+        required: ['path'],
+      },
+    },
+  },
+  {
+    type: 'function' as const,
+    function: {
+      name: 'fs_delete_file_or_dir',
+      description: '删除指定文件或文件夹。参数 path 是相对于工作目录的路径。请谨慎使用。',
+      parameters: {
+        type: 'object' as const,
+        properties: { path: { type: 'string', description: '文件/文件夹路径' } },
+        required: ['path'],
+      },
+    },
+  },
+];
+
+async function executeFileSystemTool(name: string, args: Record<string, unknown>): Promise<string> {
+  try {
+    switch (name) {
+      case 'fs_list_directory': {
+        const files = fsOps.listDir((args.path as string) || '.');
+        return JSON.stringify(files.map(f => ({
+          name: f.name, path: f.path, type: f.type, size: f.size
+        })), null, 2);
+      }
+      case 'fs_read_file': {
+        const content = fsOps.readFileContent(args.path as string);
+        return content.length > 10000 ? content.substring(0, 10000) + '\n...(已截断，文件过大)' : content;
+      }
+      case 'fs_write_file': {
+        fsOps.writeFileContent(args.path as string, args.content as string);
+        return `✅ 文件已保存: ${args.path}`;
+      }
+      case 'fs_create_directory': {
+        fsOps.createDir(args.path as string);
+        return `✅ 文件夹已创建: ${args.path}`;
+      }
+      case 'fs_delete_file_or_dir': {
+        fsOps.deleteFileOrDir(args.path as string);
+        return `✅ 已删除: ${args.path}`;
+      }
+      default:
+        return `未知的文件操作: ${name}`;
+    }
+  } catch (e: unknown) {
+    return `错误: ${(e as Error).message}`;
+  }
+}
 
 interface ChatStreamRequest {
   provider: ModelProvider;
@@ -48,7 +147,8 @@ export function registerChatIpc(): void {
       } = params;
 
       const mcpTools = mcpManager.getToolsForProvider();
-      const hasTools = mcpTools.length > 0;
+      const allTools = [...FILE_SYSTEM_TOOLS, ...mcpTools];
+      const hasTools = allTools.length > 0;
 
       try {
         const fullContent = await streamAndCollect(
@@ -62,7 +162,7 @@ export function registerChatIpc(): void {
           baseUrl,
           temperature,
           maxTokens,
-          hasTools ? mcpTools : undefined,
+          hasTools ? allTools : undefined,
         );
         return { success: true, content: fullContent };
       } catch (e) {
@@ -131,15 +231,26 @@ async function streamAndCollect(
     maxTokens: maxTokens ?? 4096,
     apiKey: apiKey || undefined,
     baseUrl: baseUrl || undefined,
+    tools,
   });
 
   let hasToolCalls = false;
   const toolCalls: Array<{ id: string; name: string; arguments: string }> = [];
-  let currentToolCall: { id: string; name: string; arguments: string } | null = null;
 
   for await (const chunk of stream) {
-    if (chunk.finishReason === 'tool_calls' || chunk.content) {
-      if (!hasToolCalls && chunk.content) {
+    if (chunk.toolCalls && chunk.toolCalls.length > 0) {
+      for (const tc of chunk.toolCalls) {
+        const existing = toolCalls.find(t => t.id === tc.id);
+        if (existing) {
+          existing.arguments += tc.arguments;
+        } else if (tc.id) {
+          toolCalls.push({ id: tc.id, name: tc.name, arguments: tc.arguments });
+        }
+      }
+    }
+
+    if (chunk.content) {
+      if (!hasToolCalls) {
         fullContent += chunk.content;
         win.send('chat:stream-chunk', { conversationId, messageId, content: chunk.content });
       }
@@ -158,12 +269,28 @@ async function streamAndCollect(
         for (const tc of toolCalls) {
           try {
             const args = JSON.parse(tc.arguments || '{}');
-            const result = await mcpManager.executeTool(tc.name, args);
+
+            const isFileTool = FILE_SYSTEM_TOOLS.some(t => t.function.name === tc.name);
+
+            let result: { content: string } | { content: Array<{ type: string; text: string }> } = { content: '' };
+
+            if (isFileTool) {
+              const content = await executeFileSystemTool(tc.name, args);
+              result = { content };
+            } else {
+              result = await mcpManager.executeTool(tc.name, args);
+            }
+
+            const resultContent: string = typeof result.content === 'string'
+              ? result.content
+              : Array.isArray(result.content)
+                ? (result.content as Array<{ text: string }>).map((c) => c.text).join('\n')
+                : String(result.content);
 
             win.send('chat:stream-chunk', {
               conversationId,
               messageId,
-              content: `\n> **${tc.name}**(${JSON.stringify(args)})\n> ${result.content.slice(0, 500)}${result.content.length > 500 ? '...' : ''}`,
+              content: `\n> **${tc.name}**\n> ${resultContent.slice(0, 500)}${resultContent.length > 500 ? '...' : ''}`,
             });
 
             messages.push({
@@ -172,7 +299,7 @@ async function streamAndCollect(
             });
             messages.push({
               role: 'user' as const,
-              content: `Tool result for ${tc.name}: ${result.content}`,
+              content: `Tool result for ${tc.name}: ${resultContent}`,
             });
           } catch (e) {
             win.send('chat:stream-chunk', {

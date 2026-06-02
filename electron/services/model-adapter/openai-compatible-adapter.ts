@@ -85,6 +85,7 @@ export class OpenAICompatibleAdapter extends BaseModelAdapter {
           max_tokens: request.maxTokens ?? 4096,
           top_p: request.topP ?? 1,
           stream: true,
+          ...(request.tools?.length ? { tools: request.tools } : {}),
         }),
       },
     );
@@ -99,6 +100,7 @@ export class OpenAICompatibleAdapter extends BaseModelAdapter {
 
     const decoder = new TextDecoder();
     let buffer = '';
+    const toolCallAccumulator: Record<number, { id: string; name: string; arguments: string }> = {};
 
     try {
       while (true) {
@@ -115,16 +117,43 @@ export class OpenAICompatibleAdapter extends BaseModelAdapter {
 
           if (trimmed.startsWith('data: ')) {
             const jsonStr = trimmed.slice(6);
-            if (jsonStr === '[DONE]') return;
+            if (jsonStr === '[DONE]') {
+              const toolCalls = Object.values(toolCallAccumulator);
+              if (toolCalls.length > 0) {
+                yield { content: '', finishReason: 'tool_calls', toolCalls };
+              }
+              return;
+            }
             try {
               const parsed = JSON.parse(jsonStr);
               const choice = parsed.choices?.[0];
               const delta = choice?.delta;
+              const finishReason = choice?.finish_reason;
+
+              if (delta?.tool_calls) {
+                for (const tc of delta.tool_calls) {
+                  const idx = tc.index ?? 0;
+                  if (!toolCallAccumulator[idx]) {
+                    toolCallAccumulator[idx] = { id: '', name: '', arguments: '' };
+                  }
+                  const acc = toolCallAccumulator[idx];
+                  if (tc.id) acc.id = tc.id;
+                  if (tc.function?.name) acc.name += tc.function.name;
+                  if (tc.function?.arguments) acc.arguments += tc.function.arguments;
+                }
+              }
+
               if (delta?.content) {
-                yield {
-                  content: delta.content,
-                  finishReason: choice.finish_reason || undefined,
-                };
+                yield { content: delta.content, finishReason: undefined };
+              }
+
+              if (finishReason) {
+                if (finishReason === 'tool_calls') {
+                  const toolCalls = Object.values(toolCallAccumulator);
+                  yield { content: '', finishReason: 'tool_calls', toolCalls };
+                } else {
+                  yield { content: '', finishReason };
+                }
               }
             } catch {
               // skip unparseable lines
@@ -145,6 +174,11 @@ export class OpenAICompatibleAdapter extends BaseModelAdapter {
             }
           }
         }
+      }
+
+      const toolCalls = Object.values(toolCallAccumulator);
+      if (toolCalls.length > 0) {
+        yield { content: '', finishReason: 'tool_calls', toolCalls };
       }
     } finally {
       reader.releaseLock();

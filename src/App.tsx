@@ -4,10 +4,12 @@ import { Sidebar } from '@/components/sidebar/Sidebar';
 import { ChatContainer } from '@/components/chat/ChatContainer';
 import { ExportDialog } from '@/components/chat/ExportDialog';
 import { SettingsPanel } from '@/components/settings/SettingsPanel';
+import { FilePanel } from '@/components/file/FilePanel';
 import { useShortcuts } from '@/hooks/useShortcuts';
 import { useSettingsStore } from '@/stores/settingsStore';
 import { useChatStore } from '@/stores/chatStore';
 import { useModelStore } from '@/stores/modelStore';
+import { useFileStore } from '@/stores/fileStore';
 import type { Conversation } from '@/types';
 import type { ModelConfig, ProviderInfo } from '@/types/model';
 
@@ -16,6 +18,7 @@ export default function App() {
     useSettingsStore();
   const { currentConversationId, conversations, messages } = useChatStore();
   const { setProviders, setModels, setActiveModel, getActiveModel } = useModelStore();
+  const { isPanelOpen, togglePanel, setPanelOpen } = useFileStore();
   const { t, i18n } = useTranslation();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [exportOpen, setExportOpen] = useState(false);
@@ -33,11 +36,12 @@ export default function App() {
       if (e.key === 'Escape') {
         if (exportOpen) setExportOpen(false);
         else if (settingsOpen) setSettingsOpen(false);
+        else if (isPanelOpen) setPanelOpen(false);
       }
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [settingsOpen, exportOpen]);
+  }, [settingsOpen, exportOpen, isPanelOpen]);
 
   const initData = async () => {
     try {
@@ -104,8 +108,17 @@ export default function App() {
       />
       <div
         className="flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out"
-        style={{ marginLeft: sidebarCollapsed ? 0 : sidebarWidth }}
+        style={{ marginLeft: sidebarCollapsed ? 0 : sidebarWidth, marginRight: isPanelOpen ? 300 : 0 }}
       >
+        <div className="flex items-center justify-end px-3 py-0.5 shrink-0">
+          <button onClick={togglePanel}
+            className="flex items-center gap-1 text-[12px] px-2 py-0.5 rounded-md hover:bg-[var(--bg-tertiary)] transition-colors"
+            style={{ color: isPanelOpen ? 'var(--accent)' : 'var(--text-tertiary)' }}
+            title="切换文件面板">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z" /></svg>
+            文件
+          </button>
+        </div>
         {currentConversationId ? (
           <ChatContainer onOpenSettings={() => setSettingsOpen(true)} />
         ) : (
@@ -170,6 +183,13 @@ export default function App() {
             </div>
           </div>
         )}
+      </div>
+
+      <div
+        className="transition-all duration-300 ease-in-out overflow-hidden"
+        style={{ width: isPanelOpen ? 300 : 0, minWidth: isPanelOpen ? 300 : 0 }}
+      >
+        <FilePanel />
       </div>
 
       <ExportDialog

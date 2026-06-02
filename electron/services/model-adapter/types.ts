@@ -21,6 +21,14 @@ export interface ChatRequest {
   stream?: boolean;
   apiKey?: string;
   baseUrl?: string;
+  tools?: Array<{
+    type: 'function';
+    function: {
+      name: string;
+      description: string;
+      parameters: Record<string, unknown>;
+    };
+  }>;
 }
 
 export interface ChatResponse {
@@ -34,9 +42,16 @@ export interface ChatResponse {
   };
 }
 
+export interface ToolCall {
+  id: string;
+  name: string;
+  arguments: string;
+}
+
 export interface ChatChunk {
   content: string;
   finishReason?: string;
+  toolCalls?: ToolCall[];
 }
 
 export interface ModelInfo {

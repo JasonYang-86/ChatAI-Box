@@ -36,3 +36,7 @@ npm-debug.log*
 
 # Electron builder
 *.asar
+
+# Releases (large binaries, upload via GitHub Releases)
+release/
+*.zip

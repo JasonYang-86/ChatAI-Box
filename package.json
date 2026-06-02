@@ -1,6 +1,6 @@
 {
   "name": "chatai",
-  "version": "0.1.0",
+  "version": "1.2.0",
   "description": "极简风格桌面AI聊天软件，支持全部主流AI模型自由切换，数据完全本地存储",
   "main": "dist-electron/main.js",
   "scripts": {

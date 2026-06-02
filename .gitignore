@@ -4,7 +4,7 @@ node_modules/
 # Build output
 dist/
 dist-electron/
-release/
+ChatAI-BOX/
 ChatAI-build/
 ChatAI-v2/
 ChatAI-v3/

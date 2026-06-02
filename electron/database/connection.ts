@@ -218,6 +218,18 @@ function initializeSchema(database: SqlJsDatabase): void {
     )
   `);
 
+  database.run(`
+    CREATE TABLE IF NOT EXISTS mcp_servers (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      command TEXT NOT NULL,
+      args TEXT NOT NULL DEFAULT '[]',
+      env TEXT,
+      is_enabled INTEGER DEFAULT 1,
+      created_at INTEGER NOT NULL
+    )
+  `);
+
   createIndexes(database);
 }
 

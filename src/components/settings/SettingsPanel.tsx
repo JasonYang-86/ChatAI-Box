@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { ModelConfigPanel } from './ModelConfigPanel';
 import { CharacterPanel } from './CharacterPanel';
 import { KnowledgeManager } from '@/components/knowledge/KnowledgeManager';
+import { MCPSettings } from './MCPSettings';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -10,7 +11,7 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
-  const [tab, setTab] = useState<'models' | 'characters' | 'knowledge'>('models');
+  const [tab, setTab] = useState<'models' | 'characters' | 'knowledge' | 'mcp'>('models');
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -30,6 +31,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
     { key: 'models' as const, label: t('settings.models') },
     { key: 'characters' as const, label: t('settings.characters') },
     { key: 'knowledge' as const, label: t('settings.knowledge') },
+    { key: 'mcp' as const, label: 'MCP' },
   ];
 
   return (
@@ -65,6 +67,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
         {tab === 'models' && <ModelConfigPanel />}
         {tab === 'characters' && <CharacterPanel />}
         {tab === 'knowledge' && <KnowledgeManager />}
+        {tab === 'mcp' && <MCPSettings />}
       </div>
     </div>
   );

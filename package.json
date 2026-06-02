@@ -54,7 +54,7 @@
     "appId": "com.chatai.app",
     "productName": "ChatAI",
     "directories": {
-      "output": "release"
+      "output": "ChatAI-BOX"
     },
     "files": [
       "dist/**/*",

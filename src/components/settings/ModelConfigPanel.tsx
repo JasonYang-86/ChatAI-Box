@@ -8,110 +8,97 @@ export function ModelConfigPanel() {
   const { t } = useTranslation();
   const [showAdd, setShowAdd] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [testingId, setTestingId] = useState<string | null>(null);
-
   const [form, setForm] = useState({ provider: 'openai', modelName: '', apiKey: '', baseUrl: '' });
 
-  useEffect(() => { loadProvidersAndModels(); }, []);
+  useEffect(() => { load(); }, []);
 
-  const loadProvidersAndModels = async () => {
+  const load = async () => {
     try {
-      const providerList = await window.electronAPI.invoke('chat:getProviders') as ProviderInfo[];
-      setProviders(providerList);
-      const dbModels = await window.electronAPI.invoke('model:list') as ModelConfig[];
-      if (Array.isArray(dbModels)) { setModels(dbModels); if (dbModels.length > 0 && !activeModelId) setActiveModel(dbModels[0].id); }
+      const plist = await window.electronAPI.invoke('chat:getProviders') as ProviderInfo[];
+      setProviders(plist);
+      const mlist = await window.electronAPI.invoke('model:list') as ModelConfig[];
+      if (Array.isArray(mlist)) { setModels(mlist); if (mlist.length && !activeModelId) setActiveModel(mlist[0].id); }
     } catch {}
   };
 
-  const selectedProvider = providers.find((p) => p.id === form.provider);
+  const sel = providers.find((p) => p.id === form.provider);
 
   const handleAdd = async () => {
     if (!form.modelName.trim()) return;
-    const id = crypto.randomUUID(); const now = Date.now();
-    const newModel: ModelConfig = { id, provider: form.provider, modelName: form.modelName.trim(), displayName: `${selectedProvider?.name || form.provider} - ${form.modelName.trim()}`, apiKey: form.apiKey.trim(), baseUrl: form.baseUrl.trim() || selectedProvider?.defaultBaseUrl || '', isEnabled: true, createdAt: now };
-    try { await window.electronAPI.invoke('model:create', { provider: newModel.provider, modelName: newModel.modelName, displayName: newModel.displayName, apiKey: newModel.apiKey, baseUrl: newModel.baseUrl, isEnabled: 1, sortOrder: 0 }); } catch {}
-    addModel(newModel); setForm({ provider: 'openai', modelName: '', apiKey: '', baseUrl: '' }); setShowAdd(false);
+    const id = crypto.randomUUID();
+    const m: ModelConfig = { id, provider: form.provider, modelName: form.modelName.trim(),
+      displayName: `${sel?.name || form.provider} - ${form.modelName.trim()}`,
+      apiKey: form.apiKey.trim(), baseUrl: form.baseUrl.trim() || sel?.defaultBaseUrl || '', isEnabled: true, createdAt: Date.now() };
+    try { await window.electronAPI.invoke('model:create', { provider: m.provider, modelName: m.modelName, displayName: m.displayName, apiKey: m.apiKey, baseUrl: m.baseUrl, isEnabled: 1, sortOrder: 0 }); } catch {}
+    addModel(m); setForm({ provider: 'openai', modelName: '', apiKey: '', baseUrl: '' }); setShowAdd(false);
   };
 
-  const handleEdit = (model: ModelConfig) => { setEditingId(model.id); setForm({ provider: model.provider, modelName: model.modelName, apiKey: model.apiKey, baseUrl: model.baseUrl }); };
+  const startEdit = (m: ModelConfig) => { setEditingId(m.id); setForm({ provider: m.provider, modelName: m.modelName, apiKey: m.apiKey, baseUrl: m.baseUrl }); };
 
-  const handleSaveEdit = async () => {
+  const saveEdit = async () => {
     if (!editingId || !form.modelName.trim()) return;
-    try { await window.electronAPI.invoke('model:update', editingId, { model_name: form.modelName.trim(), display_name: `${selectedProvider?.name || form.provider} - ${form.modelName.trim()}`, api_key: form.apiKey.trim(), base_url: form.baseUrl.trim() }); } catch {}
-    updateModel(editingId, { provider: form.provider, modelName: form.modelName.trim(), displayName: `${selectedProvider?.name || form.provider} - ${form.modelName.trim()}`, apiKey: form.apiKey.trim(), baseUrl: form.baseUrl.trim() });
+    try { await window.electronAPI.invoke('model:update', editingId, { model_name: form.modelName.trim(), display_name: `${sel?.name || form.provider} - ${form.modelName.trim()}`, api_key: form.apiKey.trim(), base_url: form.baseUrl.trim() }); } catch {}
+    updateModel(editingId, { provider: form.provider, modelName: form.modelName.trim(), displayName: `${sel?.name || form.provider} - ${form.modelName.trim()}`, apiKey: form.apiKey.trim(), baseUrl: form.baseUrl.trim() });
     setEditingId(null); setForm({ provider: 'openai', modelName: '', apiKey: '', baseUrl: '' });
   };
 
-  const handleDelete = async (id: string) => { try { await window.electronAPI.invoke('model:delete', id); } catch {} removeModel(id); };
-
-  const handleTest = async (model: ModelConfig) => {
-    setTestingId(model.id);
-    try { const result = await window.electronAPI.invoke('chat:validateKey', model.provider, model.apiKey, model.baseUrl) as { valid: boolean }; alert(result.valid ? t('settings.connectSuccess') : t('settings.connectFail')); } catch { alert(t('settings.connectFail')); }
-    setTestingId(null);
-  };
-
-  const handleFetchModels = async (model: ModelConfig) => {
-    setTestingId(model.id);
-    try { const result = await window.electronAPI.invoke('chat:listModels', model.provider, model.apiKey, model.baseUrl) as { models: { id: string; name: string }[]; error?: string }; alert(result.error ? result.error : result.models.map((m) => m.id).join('\n')); } catch { alert(t('settings.connectFail')); }
-    setTestingId(null);
-  };
-
-  const PROVIDER_EMOJI: Record<string, string> = { openai: '🤖', anthropic: '🧠', deepseek: '🔍', tongyi: '☁️', moonshot: '🌙', ollama: '🖥️', 'openai-compatible': '🔌' };
+  const remove = async (id: string) => { try { await window.electronAPI.invoke('model:delete', id); } catch {} removeModel(id); };
 
   return (
-    <div className="p-4 space-y-4">
+    <div className="p-5 space-y-5">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-text-primary">{t('settings.modelConfig')}</h3>
-        <button onClick={() => setShowAdd(!showAdd)} className="btn-secondary text-xs py-1 px-3">{showAdd ? t('settings.cancel') : t('settings.addModel')}</button>
+        <h3 className="text-[14px] font-semibold" style={{ color: 'var(--text-primary)' }}>{t('settings.modelConfig')}</h3>
+        <button onClick={() => setShowAdd(!showAdd)} className="btn-secondary text-[13px] py-1.5 px-4 rounded-xl">
+          {showAdd ? '取消' : t('settings.addModel')}</button>
       </div>
+
       {(showAdd || editingId) && (
-        <div className="bg-bg-secondary rounded-xl p-4 space-y-3 border border-border">
-          <div>
-            <label className="block text-xs text-text-secondary mb-1">{t('settings.provider')}</label>
-            <select className="w-full bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent" value={form.provider} onChange={(e) => setForm({ ...form, provider: e.target.value })}>
-              {providers.map((p) => (<option key={p.id} value={p.id}>{p.name}</option>))}
-            </select>
-            {selectedProvider && <p className="text-xs text-text-secondary mt-1">{selectedProvider.description}</p>}
-          </div>
-          {selectedProvider?.requiresApiKey !== false && (
-            <div>
-              <label className="block text-xs text-text-secondary mb-1">{t('settings.apiKey')}</label>
-              <input type="password" className="w-full bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent" value={form.apiKey} onChange={(e) => setForm({ ...form, apiKey: e.target.value })} placeholder="sk-..." />
-            </div>
+        <div className="card animate-fade-in-up">
+          <div><label className="label">{t('settings.provider')}</label>
+            <select className="select-field" value={form.provider} onChange={(e) => setForm({ ...form, provider: e.target.value })}>
+              {providers.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select></div>
+          {sel?.requiresApiKey !== false && (
+            <div className="mt-3"><label className="label">{t('settings.apiKey')}</label>
+              <input type="password" className="input-field" value={form.apiKey}
+                onChange={(e) => setForm({ ...form, apiKey: e.target.value })} placeholder="sk-..." /></div>
           )}
-          <div>
-            <label className="block text-xs text-text-secondary mb-1">{t('settings.apiUrl')}</label>
-            <input type="text" className="w-full bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent" value={form.baseUrl} onChange={(e) => setForm({ ...form, baseUrl: e.target.value })} placeholder={selectedProvider?.defaultBaseUrl || ''} />
-          </div>
-          <div>
-            <label className="block text-xs text-text-secondary mb-1">{t('settings.modelName')}</label>
-            <input type="text" className="w-full bg-bg-primary border border-border rounded-lg px-3 py-2 text-sm text-text-primary focus:outline-none focus:border-accent" value={form.modelName} onChange={(e) => setForm({ ...form, modelName: e.target.value })} placeholder={selectedProvider?.defaultModels?.join(', ') || ''} />
-            {selectedProvider?.defaultModels && selectedProvider.defaultModels.length > 0 && (
-              <div className="flex flex-wrap gap-1 mt-2">
-                {selectedProvider.defaultModels.map((m) => (
-                  <button key={m} className="text-xs px-2 py-0.5 rounded-md bg-bg-tertiary text-text-secondary hover:text-text-primary hover:bg-border transition-colors" onClick={() => setForm({ ...form, modelName: m })}>{m}</button>
-                ))}
-              </div>
-            )}
-          </div>
-          <div className="flex gap-2 pt-1">
-            <button onClick={editingId ? handleSaveEdit : handleAdd} className="btn-primary text-xs py-1.5 px-4 flex-1">{editingId ? t('settings.save') : t('settings.add')}</button>
-            <button onClick={() => { setShowAdd(false); setEditingId(null); }} className="btn-secondary text-xs py-1.5 px-4">{t('settings.cancel')}</button>
+          <div className="mt-3"><label className="label">{t('settings.apiUrl')}</label>
+            <input className="input-field" value={form.baseUrl}
+              onChange={(e) => setForm({ ...form, baseUrl: e.target.value })} placeholder={sel?.defaultBaseUrl || ''} /></div>
+          <div className="mt-3"><label className="label">{t('settings.modelName')}</label>
+            <input className="input-field" value={form.modelName}
+              onChange={(e) => setForm({ ...form, modelName: e.target.value })} placeholder={sel?.defaultModels?.join(', ') || ''} /></div>
+          <div className="flex gap-2 mt-4">
+            <button onClick={editingId ? saveEdit : handleAdd} className="btn-primary text-[13px] py-2 px-5 rounded-xl flex-1">
+              {editingId ? '保存' : '添加'}</button>
+            <button onClick={() => { setShowAdd(false); setEditingId(null); }} className="btn-secondary text-[13px] py-2 px-5 rounded-xl">取消</button>
           </div>
         </div>
       )}
-      <div className="space-y-2">
-        {models.length === 0 && <p className="text-text-secondary text-sm text-center py-4">{t('settings.noModels')}</p>}
-        {models.map((model) => (
-          <div key={model.id} className={`flex items-center gap-2 p-2.5 rounded-lg cursor-pointer transition-colors text-sm ${activeModelId === model.id ? 'bg-accent/10 border border-accent/30' : 'bg-bg-secondary border border-border hover:border-accent/30'}`} onClick={() => setActiveModel(model.id)}>
-            <span className="text-base flex-shrink-0">{PROVIDER_EMOJI[model.provider] || ''}</span>
-            <div className="flex-1 min-w-0"><div className="text-text-primary text-sm truncate">{model.displayName}</div><div className="text-text-secondary text-[11px]">{model.modelName}</div></div>
-            {activeModelId === model.id && <span className="text-xs text-accent font-medium flex-shrink-0">{t('settings.inUse')}</span>}
-            <div className="flex items-center gap-0.5 flex-shrink-0">
-              <button className="p-1 rounded hover:bg-bg-tertiary text-text-secondary text-xs" onClick={(e) => { e.stopPropagation(); handleTest(model); }} disabled={testingId === model.id} title={t('settings.testConnection')}>{testingId === model.id ? '...' : '🔗'}</button>
-              <button className="p-1 rounded hover:bg-bg-tertiary text-text-secondary text-xs" onClick={(e) => { e.stopPropagation(); handleFetchModels(model); }} disabled={testingId === model.id} title={t('settings.fetchModels')}>📋</button>
-              <button className="p-1 rounded hover:bg-bg-tertiary text-text-secondary text-xs" onClick={(e) => { e.stopPropagation(); handleEdit(model); }} title={t('chat.rename')}>✏️</button>
-              <button className="p-1 rounded hover:bg-red-100 dark:hover:bg-red-900 text-text-secondary hover:text-red-500 text-xs" onClick={(e) => { e.stopPropagation(); handleDelete(model.id); }} title={t('chat.delete')}>🗑️</button>
+
+      <div className="space-y-1.5">
+        {models.map((m) => (
+          <div key={m.id}
+            className="flex items-center gap-3 p-3 rounded-xl cursor-pointer transition-all text-[13px] group"
+            style={activeModelId === m.id
+              ? { background: 'var(--accent-soft)', border: '1px solid var(--accent-soft)' }
+              : { background: 'var(--bg-primary)', border: '1px solid var(--border)' }}
+            onClick={() => setActiveModel(m.id)}>
+            <div className="flex-1 min-w-0">
+              <div className="truncate font-medium" style={{ color: 'var(--text-primary)' }}>{m.displayName}</div>
+              <div className="text-[11px]" style={{ color: 'var(--text-muted)' }}>{m.modelName}</div>
+            </div>
+            {activeModelId === m.id && <span className="text-[11px] font-medium" style={{ color: 'var(--accent)' }}>当前</span>}
+            <div className="shrink-0 flex items-center gap-0.5 opacity-0 group-hover:opacity-100">
+              <button className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[var(--bg-tertiary)]"
+                style={{ color: 'var(--text-muted)' }} onClick={(e) => { e.stopPropagation(); startEdit(m); }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M17 3a2.828 2.828 0 114 4L7.5 20.5 3 22l1.5-4.5L17 3z" /></svg>
+              </button>
+              <button className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[rgba(255,64,58,0.1)]"
+                onClick={(e) => { e.stopPropagation(); remove(m.id); }} style={{ color: 'var(--danger)' }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2" /></svg>
+              </button>
             </div>
           </div>
         ))}

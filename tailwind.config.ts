@@ -6,10 +6,10 @@ export default {
     extend: {
       colors: {
         accent: {
-          DEFAULT: '#6C5CE7',
-          hover: '#7C6EF7',
-          soft: 'rgba(108, 92, 231, 0.15)',
-          glow: 'rgba(108, 92, 231, 0.25)',
+          DEFAULT: '#FF403A',
+          hover: '#E83830',
+          soft: 'rgba(255, 64, 58, 0.1)',
+          glow: 'rgba(255, 64, 58, 0.2)',
         },
         bg: {
           primary: 'var(--bg-primary)',
@@ -29,12 +29,12 @@ export default {
         },
         border: 'var(--border)',
         'border-light': 'var(--border-light)',
-        success: '#00D4AA',
-        warning: '#F7B731',
-        error: '#FC5C65',
+        success: '#10B981',
+        warning: '#F59E0B',
+        danger: '#FF403A',
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'sans-serif'],
+        sans: ['-apple-system', 'BlinkMacSystemFont', 'Inter', 'SF Pro Display', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'Cascadia Code', 'Fira Code', 'Consolas', 'monospace'],
       },
     },

@@ -24,71 +24,51 @@ export function ChatInput({ onSend, disabled = false }: ChatInputProps) {
     if (!input.trim() || disabled) return;
     onSend(input.trim());
     setInput('');
-    if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-    }
+    if (textareaRef.current) textareaRef.current.style.height = 'auto';
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); }
   };
 
-  const hasKnowledgeFiles = files.some((f) => f.status === 'ready');
+  const hasKB = files.some((f) => f.status === 'ready');
 
   return (
-    <div className="border-t border-border bg-bg-primary px-4 py-3">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex items-end gap-2 bg-bg-secondary rounded-2xl px-4 py-2 border border-border focus-within:border-accent transition-all duration-200 focus-within:shadow-sm">
-          <textarea
-            ref={textareaRef}
-            className="flex-1 resize-none bg-transparent text-text-primary text-[15px] leading-relaxed outline-none placeholder:text-text-secondary py-1.5 max-h-[200px]"
+    <div className="px-4 pb-3 pt-1">
+      <div className="max-w-[720px] mx-auto">
+        <div className="flex items-end gap-2 px-4 py-2.5 rounded-2xl border transition-all duration-200"
+          style={{
+            background: 'var(--bg-secondary)',
+            borderColor: 'var(--border)',
+          }}>
+          <textarea ref={textareaRef}
+            className="flex-1 resize-none bg-transparent text-[15px] leading-relaxed outline-none py-1 max-h-[160px]"
+            style={{ color: 'var(--text-primary)' }}
             placeholder={t('chat.inputPlaceholder')}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            rows={1}
-            disabled={disabled}
-            aria-label={t('chat.inputPlaceholder')}
-          />
-          <button
-            className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-150 ${
-              input.trim() && !disabled
-                ? 'bg-accent text-white hover:bg-accent-hover hover:scale-105 active:scale-95'
-                : 'bg-bg-tertiary text-text-secondary cursor-not-allowed'
-            }`}
-            onClick={handleSend}
-            disabled={!input.trim() || disabled}
-            aria-label={t('chat.send')}
-          >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" />
+            value={input} onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown} rows={1} disabled={disabled} />
+          <button onClick={handleSend} disabled={!input.trim() || disabled}
+            className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center transition-all duration-200"
+            style={input.trim() && !disabled
+              ? { background: 'linear-gradient(135deg, #FF403A, #FF6B6B)', color: '#fff', boxShadow: '0 2px 8px rgba(255,64,58,0.3)' }
+              : { background: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19V5M5 12l7-7 7 7" />
             </svg>
           </button>
         </div>
-        <div className="flex items-center justify-between mt-2">
-          <div className="flex items-center gap-2">
-            {hasKnowledgeFiles && (
-              <button
-                onClick={() => setKnowledgeEnabled(!knowledgeEnabled)}
-                className={`text-xs px-2 py-0.5 rounded-md transition-all duration-200 ${
-                  knowledgeEnabled
-                    ? 'bg-accent/10 text-accent border border-accent/30'
-                    : 'bg-bg-tertiary text-text-secondary border border-border hover:border-text-secondary'
-                }`}
-                title={knowledgeEnabled ? t('knowledge.knowledgeOnHint') : t('knowledge.knowledgeOffHint')}
-                aria-label={knowledgeEnabled ? t('knowledge.knowledgeOff') : t('knowledge.knowledgeOn')}
-              >
-                <span className="mr-1">📚</span>
-                {knowledgeEnabled ? t('knowledge.knowledgeOn') : t('knowledge.knowledgeOff')}
-              </button>
-            )}
-          </div>
-          <p className="text-text-secondary text-[11px] opacity-50 select-none">
-            {t('app.hint')}
-          </p>
+        <div className="flex items-center justify-between mt-2 px-1">
+          {hasKB && (
+            <button onClick={() => setKnowledgeEnabled(!knowledgeEnabled)}
+              className="text-[11px] font-medium px-2.5 py-1 rounded-lg transition-all"
+              style={knowledgeEnabled
+                ? { background: 'var(--accent-soft)', color: 'var(--accent)' }
+                : { background: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}>
+              {knowledgeEnabled ? t('knowledge.knowledgeOn') : t('knowledge.knowledgeOff')}
+            </button>
+          )}
+          {!hasKB && <div />}
+          <p className="text-[11px] select-none" style={{ color: 'var(--text-muted)' }}>{t('app.hint')}</p>
         </div>
       </div>
     </div>

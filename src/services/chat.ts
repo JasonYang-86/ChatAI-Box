@@ -108,7 +108,7 @@ export async function sendMessage(
     const conv = useChatStore.getState().conversations.find(
       (c) => c.id === conversationId,
     );
-    const systemPrompt = conv?.systemPrompt || '';
+    const systemPrompt = conv?.systemPrompt || `你是 ChatAI，一个智能 AI 助手。你当前运行的模型是 ${modelConfig.model}（提供商：${modelConfig.provider}）。请始终以 ChatAI 的身份回答用户问题，不要自称 Claude、GPT 或其他任何特定的 AI 模型名称。`;
 
     let finalSystemPrompt = systemPrompt;
 

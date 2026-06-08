@@ -21,6 +21,10 @@ builder-effective-config.yaml
 .DS_Store
 Thumbs.db
 
+# Python
+__pycache__/
+*.pyc
+
 # Env
 .env
 .env.local

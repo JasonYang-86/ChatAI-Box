@@ -32,6 +32,8 @@
     "models": "Models",
     "characters": "AI Characters",
     "knowledge": "Knowledge Base",
+    "memory": "Memory",
+    "mcp": "MCP",
     "modelConfig": "Model Configuration",
     "addModel": "+ Add",
     "add": "Add",

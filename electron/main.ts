@@ -7,6 +7,7 @@ import { registerChatIpc } from './ipc/chat.ipc';
 import { registerKnowledgeIpc } from './ipc/knowledge.ipc';
 import { registerMCPIpc, initMCP } from './ipc/mcp.ipc';
 import { registerFileIpc } from './ipc/file.ipc';
+import { registerMemoryIpc } from './ipc/memory.ipc';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -113,6 +114,7 @@ app.whenReady().then(async () => {
   registerKnowledgeIpc();
   registerMCPIpc();
   registerFileIpc();
+  registerMemoryIpc();
   initMCP().catch((e) => console.error('MCP init error:', e));
   createWindow();
   setupAutoUpdater();

@@ -4,6 +4,7 @@ import { ModelConfigPanel } from './ModelConfigPanel';
 import { CharacterPanel } from './CharacterPanel';
 import { KnowledgeManager } from '@/components/knowledge/KnowledgeManager';
 import { MCPSettings } from './MCPSettings';
+import { MemoryPanel } from '@/components/memory/MemoryPanel';
 
 interface SettingsPanelProps {
   isOpen: boolean;
@@ -11,7 +12,7 @@ interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
-  const [tab, setTab] = useState<'models' | 'characters' | 'knowledge' | 'mcp'>('models');
+  const [tab, setTab] = useState<'models' | 'characters' | 'knowledge' | 'mcp' | 'memory'>('models');
   const { t } = useTranslation();
 
   useEffect(() => {
@@ -27,7 +28,8 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
     { key: 'models' as const, label: t('settings.models') },
     { key: 'characters' as const, label: t('settings.characters') },
     { key: 'knowledge' as const, label: t('settings.knowledge') },
-    { key: 'mcp' as const, label: 'MCP' },
+    { key: 'mcp' as const, label: t('settings.mcp') },
+    { key: 'memory' as const, label: t('settings.memory') },
   ];
 
   return (
@@ -59,6 +61,7 @@ export function SettingsPanel({ isOpen, onClose }: SettingsPanelProps) {
         {tab === 'characters' && <CharacterPanel />}
         {tab === 'knowledge' && <KnowledgeManager />}
         {tab === 'mcp' && <MCPSettings />}
+        {tab === 'memory' && <MemoryPanel />}
       </div>
     </div>
   );

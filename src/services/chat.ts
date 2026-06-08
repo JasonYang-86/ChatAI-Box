@@ -85,6 +85,17 @@ export async function sendMessage(
             finalMsg.content,
           );
         }
+        // 保存到记忆库
+        const allMsgs = useChatStore.getState().messages.map((m) => ({
+          role: m.role as 'user' | 'assistant',
+          content: m.content,
+        }));
+        const conv = useChatStore.getState().conversations.find((c) => c.id === conversationId);
+        window.electronAPI.invoke('memory:upsert', {
+          conversationId,
+          title: conv?.title || '新对话',
+          messages: allMsgs,
+        });
       } catch {
         // browser mode
       }
@@ -132,6 +143,22 @@ export async function sendMessage(
       } catch {
         // 检索失败，不回退
       }
+    }
+
+    // 记忆系统：搜索相关历史对话
+    try {
+      const memoryContext = await window.electronAPI.invoke('memory:context', {
+        query: userContent,
+        topK: 5,
+        minScore: 0.2,
+        maxContextChars: 8000,
+      }) as string;
+      if (memoryContext) {
+        const memPrefix = `${memoryContext}\n\n---\n注意：以上是历史相关对话记录，仅作参考。如果与当前问题无关，请忽略。\n`;
+        finalSystemPrompt = memPrefix + (finalSystemPrompt || '');
+      }
+    } catch {
+      // 记忆搜索失败，不影响主流程
     }
 
     const fullMessages = finalSystemPrompt
